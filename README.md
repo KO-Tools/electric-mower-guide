@@ -49,3 +49,6 @@ This site is deployed using GitHub Pages. Any push to the main branch will autom
 ## License
 
 This project is for educational and comparison purposes. All product information and pricing is subject to change.
+
+---
+Last updated: June 2025
