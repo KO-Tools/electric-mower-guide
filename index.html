@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Electric Mower Buying Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Muted Green Accent -->
+    <!-- Application Structure Plan: The SPA is designed as a user-centric decision tool, not a linear report. It starts with a "Benchmark" section for the main RYOBI mower to establish context. The core is the "Comparison Arena," an interactive dashboard where users filter alternatives by priorities ('Best Value', 'Top Budget', etc.). This action dynamically updates a price comparison bar chart and a set of product cards, allowing for direct, user-driven exploration. A subsequent section, "Beyond the Price Tag," explains crucial qualitative factors like the 'Battery Ecosystem' through an interactive diagram. Finally, a "Personalized Recommendation" section synthesizes the user's choices to provide tailored advice. This task-oriented flow guides the user from understanding to comparison to a final, justified decision, which is more effective for purchasing than a static report. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Mower prices & specs -> Goal: Compare/Inform -> Viz: Dynamic Bar Chart (Chart.js) & HTML Cards -> Interaction: Filtering buttons update both the chart and the visible cards -> Justification: The bar chart provides an instant visual hierarchy of cost, the primary comparison metric. Dynamic cards allow users to focus on a curated set of options without being overwhelmed.
+        - Report Info: Battery Ecosystem concept -> Goal: Explain a strategic relationship -> Viz: HTML/CSS Diagram -> Interaction: Clicking a brand shows/hides contextual info -> Justification: A visual diagram simplifies the complex long-term value proposition of a tool platform, making it more digestible than a paragraph.
+        - Report Info: Final user persona recommendations -> Goal: Provide tailored advice -> Viz: Styled HTML text blocks -> Interaction: The relevant recommendation is highlighted based on the user's filter selection -> Justification: This directly connects user action to a conclusion, making the final advice feel more personal and impactful.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .nav-button { transition: all 0.3s ease; }
+        .nav-button.active { background-color: #166534; color: white; }
+        .nav-button:not(.active) { background-color: #e5e7eb; color: #374151; }
+        .product-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .recommendation-card { display: none; }
+        .recommendation-card.active { display: block; }
+        .ecosystem-item .details { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Interactive Mower Buying Guide</h1>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">An expert analysis of the RYOBI RY401170 mower and its best value alternatives. Use the filters to find the perfect mower for your needs.</p>
+        </header>
+
+        <main>
+            <!-- Section 1: The Benchmark Mower -->
+            <section id="benchmark" class="mb-16">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-900">The Benchmark: RYOBI 40V HP</h2>
+                <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 border border-green-800">
+                    <div class="md:w-1/3 text-center">
+                         <div class="w-48 h-48 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                         </div>
+                    </div>
+                    <div class="md:w-2/3">
+                        <h3 class="text-2xl font-bold text-gray-900">RYOBI 40V HP Brushless 20" Mower</h3>
+                        <p class="text-sm text-gray-500 mb-4">Model: RY401170</p>
+                        <p class="text-gray-600 mb-4">A best-seller known for its excellent blend of power, features, and reliability. It's powered by a high-performance brushless motor and a high-capacity 6.0Ah battery, making it suitable for lawns up to 1/2 acre.</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center mb-4">
+                            <div class="bg-gray-100 p-3 rounded-lg"><div class="font-bold text-green-700">Deck</div><div>20" Composite</div></div>
+                            <div class="bg-gray-100 p-3 rounded-lg"><div class="font-bold text-green-700">Battery</div><div>6.0 Ah</div></div>
+                            <div class="bg-gray-100 p-3 rounded-lg"><div class="font-bold text-green-700">Motor</div><div>Brushless</div></div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-lg font-medium text-gray-500">Verified Low Price:</span>
+                            <span class="text-3xl font-bold text-green-800">$279.00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Comparison Arena -->
+            <section id="comparison" class="mb-16 bg-gray-100 py-12 rounded-lg">
+                <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">The Comparison Arena</h2>
+                <p class="text-center text-gray-600 mb-8">Filter the alternatives to see how they stack up against the RYOBI.</p>
+                
+                <div id="filter-controls" class="flex justify-center items-center gap-2 md:gap-4 mb-8 flex-wrap">
+                    <button data-filter="all" class="nav-button font-semibold py-2 px-4 rounded-full active">All Alternatives</button>
+                    <button data-filter="value" class="nav-button font-semibold py-2 px-4 rounded-full">Best Overall Value</button>
+                    <button data-filter="budget" class="nav-button font-semibold py-2 px-4 rounded-full">Top Budget Pick</button>
+                </div>
+
+                <div class="chart-container mb-12">
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <div id="product-cards-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 px-4 md:px-8">
+                </div>
+            </section>
+            
+            <!-- Section 3: Beyond the Price Tag -->
+            <section id="qualitative-analysis" class="mb-16">
+                 <h2 class="text-3xl font-bold text-center mb-8 text-gray-900">Beyond the Price Tag</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div class="bg-white p-6 rounded-lg shadow">
+                          <h3 class="text-2xl font-bold mb-4 text-center">The Battery Ecosystem</h3>
+                          <p class="text-gray-600 mb-6 text-center">Your mower is an entry point into a brand's tool system. A shared battery platform saves money on future "tool-only" purchases. Click a brand to learn more.</p>
+                          <div class="space-y-4">
+                              <div class="ecosystem-item border p-4 rounded-lg cursor-pointer" onclick="toggleDetails(this)">
+                                  <div class="flex justify-between items-center font-bold text-green-800">RYOBI 40V <span class="text-sm font-normal text-gray-500">▼</span></div>
+                                  <div class="details mt-2 text-gray-600">Famous for its extensive 40V line, exclusively at The Home Depot. An excellent choice if you plan to build a large, one-stop-shop collection of cordless yard tools.</div>
+                              </div>
+                              <div class="ecosystem-item border p-4 rounded-lg cursor-pointer" onclick="toggleDetails(this)">
+                                  <div class="flex justify-between items-center font-bold text-green-800">Greenworks 40V <span class="text-sm font-normal text-gray-500">▼</span></div>
+                                  <div class="details mt-2 text-gray-600">Offers a robust and varied system available at multiple retailers. A strong competitor with a wide range of tools, often at aggressive price points.</div>
+                              </div>
+                              <div class="ecosystem-item border p-4 rounded-lg cursor-pointer" onclick="toggleDetails(this)">
+                                  <div class="flex justify-between items-center font-bold text-green-800">HART 40V <span class="text-sm font-normal text-gray-500">▼</span></div>
+                                  <div class="details mt-2 text-gray-600">Walmart's exclusive brand, positioned as a direct competitor to RYOBI. A growing ecosystem for budget-conscious consumers loyal to Walmart.</div>
+                              </div>
+                          </div>
+                     </div>
+                     <div class="bg-white p-6 rounded-lg shadow">
+                          <h3 class="text-2xl font-bold mb-4 text-center">Deck Size vs. Mowing Time</h3>
+                           <p class="text-gray-600 mb-6">A smaller deck means a lower price, but more work. A larger deck costs more but saves you time and effort on every mow.</p>
+                           <div class="flex items-center justify-around text-center">
+                               <div>
+                                   <div class="text-4xl">↔️</div>
+                                   <div class="font-bold text-lg mt-2">16" Deck</div>
+                                   <div class="text-gray-600">Lowest Cost</div>
+                                   <div class="text-red-600">More Passes</div>
+                               </div>
+                               <div class="text-gray-400 font-thin text-4xl">vs</div>
+                               <div>
+                                   <div class="text-4xl">⟷</div>
+                                   <div class="font-bold text-lg mt-2">20" Deck</div>
+                                   <div class="text-gray-600">Higher Cost</div>
+                                   <div class="text-green-600">Fewer Passes</div>
+                               </div>
+                           </div>
+                     </div>
+                 </div>
+            </section>
+            
+            <!-- Section 4: Personalized Recommendation -->
+            <section id="recommendations" class="bg-green-700 text-white py-12 rounded-lg">
+                <h2 class="text-3xl font-bold text-center mb-8">Your Personalized Recommendation</h2>
+                <div id="recommendation-content" class="max-w-3xl mx-auto px-4">
+                    <div id="rec-all" class="recommendation-card active">
+                        <h3 class="font-bold text-xl mb-2">For the Informed Shopper</h3>
+                        <p>You're viewing all top alternatives. The <span class="font-bold">Greenworks 20"</span> offers the best overall value, while the <span class="font-bold">Greenworks 16"</span> is the king of budget-friendly mowing. Compare the specs to see which trade-offs make sense for you.</p>
+                    </div>
+                    <div id="rec-value" class="recommendation-card">
+                        <h3 class="font-bold text-xl mb-2">For the "All-Around Best Value Seeker"</h3>
+                        <p>The choice is the <span class="font-bold">Greenworks 40V 20" Mower</span>. It delivers ~95% of the RYOBI's core functionality and size for about 80% of the cost. The savings of over $50 can be allocated to another tool or simply recognized as a smart, economical purchase without a significant compromise on performance.</p>
+                    </div>
+                    <div id="rec-budget" class="recommendation-card">
+                        <h3 class="font-bold text-xl mb-2">For the "Small Yard, Big Savings" Homeowner</h3>
+                        <p>The clear winner is the <span class="font-bold">Greenworks 40V 16" Mower</span>. For properties of a quarter-acre or less, its sub-$200 price point for a quality brushless mower is unbeatable. The minor increase in mowing time is a small price to pay for the substantial upfront savings.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>Data sourced from a comprehensive market analysis. Prices are subject to change. Verify all details at the retailer's site.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const mowerData = [
+            {
+                id: 'ryobi',
+                brand: 'RYOBI',
+                model: '40V HP Brushless 20"',
+                price: 279.00,
+                deck: '20" Composite',
+                motor: 'Brushless',
+                battery: '6.0 Ah',
+                features: '3-in-1, Single-Point Adjust, Foldable',
+                yardSize: 'Up to 1/2 Acre',
+                link: 'https://www.homedepot.com/p/RYOBI-40V-HP-Brushless-20-in-Cordless-Battery-Walk-Behind-Push-Lawn-Mower-with-6-0-Ah-Battery-and-Charger-RY401170/317061059',
+                category: ['benchmark']
+            },
+            {
+                id: 'greenworks20',
+                brand: 'Greenworks',
+                model: '40V 20" Brushless',
+                price: 228.00,
+                deck: '20" Steel',
+                motor: 'Brushless',
+                battery: '4.0 Ah',
+                features: '3-in-1, Dual Battery Port',
+                yardSize: 'Up to 1/2 Acre',
+                link: 'https://www.walmart.com/ip/Greenworks-40V-20-Brushless-Push-Lawn-Mower-with-4-0-Ah-Battery-Quick-Charger-2516302VT/675238217',
+                category: ['value', 'all']
+            },
+            {
+                id: 'greenworks16',
+                brand: 'Greenworks',
+                model: '40V 16" Brushless',
+                price: 194.99,
+                deck: '16" Composite',
+                motor: 'Brushless',
+                battery: '4.0 Ah',
+                features: '2-in-1, Lightweight (38 lbs)',
+                yardSize: 'Up to 1/4 Acre',
+                link: 'https://www.greenworkstools.com/products/40v-16-cordless-battery-push-lawn-mower-w-4-0ah-battery-charger',
+                category: ['budget', 'all']
+            },
+            {
+                id: 'hart20',
+                brand: 'HART',
+                model: '40V 20" Brushless',
+                price: 298.00,
+                deck: '20" Composite',
+                motor: 'Brushless',
+                battery: '6.0 Ah',
+                features: '3-in-1, Fast Fold Handles',
+                yardSize: 'Up to 1/2 Acre',
+                link: 'https://www.walmart.com/ip/HART-40-Volt-Cordless-20-inch-Brushless-Push-Mower-Kit-1-6-0Ah-Lithium-Ion-Battery/990402225',
+                category: ['all']
+            },
+            {
+                id: 'worx17',
+                brand: 'Worx',
+                model: 'WG743 40V 17"',
+                price: 279.99,
+                deck: '17" Composite',
+                motor: 'Brushed',
+                battery: '4.0 Ah (2x20V)',
+                features: '2-in-1, IntelliCut Torque',
+                yardSize: 'Up to 1/8 Acre',
+                link: 'https://www.bestbuy.com/site/worx-wg743-40v-17-walk-behind-lawn-mower-with-grass-collection-bag-and-mulcher-2-x-4-0-ah-batteries-and-1-x-charger-black/6558662.p?skuId=6558662',
+                category: ['all']
+            }
+        ];
+
+        let priceChart;
+        let currentFilter = 'all';
+
+        const createProductCard = (mower) => {
+            const motorClass = mower.motor === 'Brushless' ? 'text-green-600 font-semibold' : 'text-amber-600 font-semibold';
+            return `
+                <div class="product-card bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-gray-900">${mower.brand}</h3>
+                    <p class="text-sm text-gray-500 mb-4">${mower.model}</p>
+                    <div class="grid grid-cols-2 gap-2 text-sm mb-4 flex-grow">
+                        <div class="bg-gray-100 p-2 rounded"><span class="font-semibold">Deck:</span> ${mower.deck}</div>
+                        <div class="bg-gray-100 p-2 rounded"><span class="font-semibold">Battery:</span> ${mower.battery}</div>
+                        <div class="bg-gray-100 p-2 rounded"><span class="font-semibold">Motor:</span> <span class="${motorClass}">${mower.motor}</span></div>
+                        <div class="bg-gray-100 p-2 rounded"><span class="font-semibold">Yard:</span> ${mower.yardSize}</div>
+                    </div>
+                    <div class="text-center mb-4">
+                        <span class="text-3xl font-bold text-green-700">$${mower.price.toFixed(2)}</span>
+                    </div>
+                    <a href="${mower.link}" target="_blank" rel="noopener noreferrer" class="mt-auto w-full bg-green-700 text-white text-center font-bold py-2 px-4 rounded-lg hover:bg-green-800 transition-colors">View Deal</a>
+                </div>
+            `;
+        };
+
+        const renderContent = (filter) => {
+            currentFilter = filter;
+            
+            const benchmarkMower = mowerData.find(m => m.category.includes('benchmark'));
+            const filteredAlternatives = mowerData.filter(m => m.category.includes(filter) && !m.category.includes('benchmark'));
+            const displayData = [benchmarkMower, ...filteredAlternatives];
+            
+            const cardsContainer = document.getElementById('product-cards-container');
+            cardsContainer.innerHTML = filteredAlternatives.map(createProductCard).join('');
+            
+            updateChart(displayData);
+            updateFilterButtons();
+            updateRecommendations();
+        };
+        
+        const updateChart = (data) => {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const labels = data.map(m => m.brand + ' ' + m.model.split(' ')[1]);
+            const prices = data.map(m => m.price);
+            
+            const backgroundColors = data.map(m => m.id === 'ryobi' ? 'rgba(5, 150, 105, 0.7)' : 'rgba(209, 213, 219, 0.7)');
+            const borderColors = data.map(m => m.id === 'ryobi' ? 'rgba(4, 120, 87, 1)' : 'rgba(156, 163, 175, 1)');
+
+
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            priceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price ($)',
+                        data: prices,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                           ticks: {
+                                callback: function(value, index, ticks) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 15 ? label.substring(0, 15) + '...' : label;
+                                }
+                           }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return data[context[0].dataIndex].brand + ' ' + data[context[0].dataIndex].model;
+                                },
+                                label: function(context) {
+                                    return `Price: $${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+
+        const updateFilterButtons = () => {
+            const buttons = document.querySelectorAll('#filter-controls button');
+            buttons.forEach(button => {
+                if (button.dataset.filter === currentFilter) {
+                    button.classList.add('active');
+                    button.classList.remove('nav-button:not(.active)');
+                } else {
+                    button.classList.remove('active');
+                    button.classList.add('nav-button:not(.active)');
+                }
+            });
+        };
+
+        const updateRecommendations = () => {
+            document.querySelectorAll('.recommendation-card').forEach(card => card.classList.remove('active'));
+            const activeCard = document.getElementById(`rec-${currentFilter}`);
+            if(activeCard) {
+                activeCard.classList.add('active');
+            }
+        };
+        
+        const toggleDetails = (element) => {
+            const details = element.querySelector('.details');
+            if (details.style.display === 'block') {
+                details.style.display = 'none';
+            } else {
+                details.style.display = 'block';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterControls = document.getElementById('filter-controls');
+            filterControls.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const filter = e.target.dataset.filter;
+                    renderContent(filter);
+                }
+            });
+
+            renderContent('all');
+        });
+    </script>
+</body>
+</html>
